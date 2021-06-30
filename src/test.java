@@ -2,6 +2,8 @@
 given expression where tokens
 are separated by space.
 */
+import com.sun.source.doctree.SystemPropertyTree;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -115,8 +117,10 @@ class functionresult
                  int compteur = i;
                  while ((i < tokens.length && tokens[i] >= 'a' && tokens[i] <= 'z')) {
                  i++;}
+                 System.out.println(" i = "+i);
 
-                     String func = expression.substring(compteur, i);
+
+                 String func = expression.substring(compteur, i);
  if(listfunc.contains(func)){
                      compteur = 1;
                      functionresult B = verefierfunc(func, expression, i,listfunc,variable);
@@ -142,7 +146,7 @@ class functionresult
          // parsed at this point, apply remaining
          // ops to remaining values
 
-
+         System.out.println(ops);
          while (!ops.empty()) {
              values.push(applyOp(ops.pop(),
                      values.pop(),
@@ -175,11 +179,13 @@ class functionresult
                  position++;
              }
 String nvexp= express.substring(indice, position).replaceAll(" ","");
+             System.out.println("nvexp "+nvexp);
              if (fonc.equals("sin")) {
                  result  = Math.sin(evaluate(nvexp,listfunc,variable));
-
              } else if (fonc.equals("cos")) {
+
                  result = Math.cos(evaluate(nvexp ,listfunc,variable));
+                 System.out.println("cos result "+result);
 
              } else if (fonc.equals("tan")) {
                  result = Math.tan(evaluate(nvexp,listfunc,variable));
@@ -193,6 +199,7 @@ String nvexp= express.substring(indice, position).replaceAll(" ","");
 
 
          }
+
          functionresult A = new functionresult();
          A.pos=position;
          A.resultat=result;
@@ -245,13 +252,8 @@ String nvexp= express.substring(indice, position).replaceAll(" ","");
 
         //HashMap<String, Double> variable = new HashMap<String, Double>();
         List<String> listfunc = Arrays.asList("sin", "cos", "tan", "sqrt");
-        variable.put("x", 3.34);
-        System.out.println(Math.sin( 2.34 +4.34+ 1.55 ));
+
         System.out.println(Test.
-                evaluate("( 2.34 + x + 1. 5 5 )", listfunc , variable));
-        System.out.println(Test.
-                evaluate("100 * sin(   3.34 +((x)) +1. 5 5 )", listfunc , variable));
-        System.out.println(Test.
-                evaluate("14 * cos( (1) ) /14", listfunc , variable));
+                evaluate(" cos( cos(3.14) ) ", listfunc , variable));
     }
 }
