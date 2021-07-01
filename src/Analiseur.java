@@ -46,15 +46,21 @@ public interface Analiseur {
                 if (tokens[i] == '.') {
                     i++;
                     String chaine = values.get(values.size() - 1).toString();
+                    System.out.println(chaine.length());
+
                     values.pop();
                     cpt = chaine.length() - 2;
 
-                    while ((i < tokens.length && tokens[i] >= '0' && tokens[i] <= '9') || tokens[i] == ' ') {
-                        i++;
-                        cpt++;
+                    while (i < tokens.length ) {
+                        if( (tokens[i] >= '0' && tokens[i] <= '9') || tokens[i] == ' '){i++;
+                        cpt++;}
+                        else break;
                     }
                     cpt++;
+
                     String doublenumber = expression.substring(i - cpt, i).replaceAll(" ", "");
+                    System.out.println(doublenumber);
+
                     values.push(signe*Double.parseDouble(doublenumber));
                 }
 
@@ -84,9 +90,11 @@ public interface Analiseur {
             // push it to 'ops'
             else if (tokens[i] == '(')
             {ops.push(tokens[i]);
-               i++;
-                if (tokens[i] == '-'){
+
+                if (tokens[i+1] == '-'){
                     i++;
+                    i++;
+
                     if ((tokens[i] >= '0' &&
                             tokens[i] <= '9') || tokens[i] == '.') {
 
