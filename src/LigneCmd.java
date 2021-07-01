@@ -21,9 +21,12 @@ public class LigneCmd {
         if(this.cmd.equals("let") )
         {
             try {
-                String tempExp = l.split(" ")[1];
+                String tempExp = l.substring(4);
+
+                tempExp.replaceAll(" ","");
+
                 if (!tempExp.contains("=")){
-                    throw new ExpresExcept("Expression Eronne");
+                    throw new ExpresExcept("Expression Eron1ne");
                 }
                var = new Variable(tempExp.split("=")[0]);
                 exp=new Expression(tempExp.split("=")[1],tableSymbole);
@@ -45,8 +48,12 @@ public class LigneCmd {
         }
         else if(this.cmd.equals("print"))
         {
+            String tempExp = l.substring(6);
+            System.out.println("tempExp \'"+tempExp+"\'");
+            tempExp.replaceAll(" ","");
+            System.out.println("tempExp without spaces \'"+tempExp+'\'');
             try {
-                exp=new Expression(l.split(" ")[1],tableSymbole);
+                exp=new Expression(tempExp,tableSymbole);
             }
             catch (ExpresExcept e){
                 System.out.println(e.getMessage());

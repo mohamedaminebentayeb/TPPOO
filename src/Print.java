@@ -11,7 +11,7 @@ public class Print extends Commande{
             System.out.println(e.getMessage());
         }
         catch (Exception e){
-            System.out.println("Expression Erroné");
+            System.out.println("Expression Egrroné");
         }
     }
 }

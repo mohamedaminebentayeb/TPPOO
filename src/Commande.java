@@ -11,7 +11,7 @@ public class Commande {
         try {
             resultat= expression.analiser();
         } catch (ExpresExcept expresExcept) {
-            throw new ExpresExcept("Fonction ou Variable introuvable");
+            throw new ExpresExcept(expresExcept.getMessage());
         }
         return resultat;
     }

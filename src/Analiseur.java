@@ -11,16 +11,18 @@ public interface Analiseur {
      default Double evaluate(String expression , HashMap<String, Double> variable)
              throws ExpresExcept{
         List<String> listfunc = Arrays.asList("sin", "cos", "tan", "sqrt","abs","log");
+        expression.replaceAll(" ","");
         char[] tokens = expression.toCharArray();
         int cpt;
-        // Stack for numbers: 'values'
+        // Stack for numbers: 'values'FSysteme
         Stack<Double> values = new
                 Stack<Double>();
 
         // Stack for Operators: 'ops'
         Stack<Character> ops = new
                 Stack<Character>();
-
+        Boolean debut = true;
+     int signe = 1;
         for (int i = 0; i < tokens.length; i++) {
 
             // Current token is a
@@ -28,6 +30,11 @@ public interface Analiseur {
             if (tokens[i] == ' ')
                 continue;
             cpt = 0;
+            if (debut == true && tokens[i] =='-'){
+                signe=-1;
+                i++;
+
+            }
 
             // Current token is a number,
             // push it to stack for numbers
@@ -48,7 +55,7 @@ public interface Analiseur {
                     }
                     cpt++;
                     String doublenumber = expression.substring(i - cpt, i).replaceAll(" ", "");
-                    values.push(Double.parseDouble(doublenumber));
+                    values.push(signe*Double.parseDouble(doublenumber));
                 }
 
                 // There may be more than one
@@ -58,7 +65,7 @@ public interface Analiseur {
                             tokens[i] >= '0' &&
                             tokens[i] <= '9')
                         sbuf.append(tokens[i++]);
-                    values.push(Double.parseDouble(sbuf.
+                    values.push(signe*Double.parseDouble(sbuf.
                             toString()));
 
                 }
@@ -76,7 +83,56 @@ public interface Analiseur {
             // Current token is an opening brace,
             // push it to 'ops'
             else if (tokens[i] == '(')
-                ops.push(tokens[i]);
+            {ops.push(tokens[i]);
+               i++;
+                if (tokens[i] == '-'){
+                    i++;
+                    if ((tokens[i] >= '0' &&
+                            tokens[i] <= '9') || tokens[i] == '.') {
+
+                        StringBuffer sbuf = new
+                                StringBuffer();
+                        if (tokens[i] == '.') {
+                            i++;
+                            String chaine = values.get(values.size() - 1).toString();
+                            values.pop();
+                            cpt = chaine.length() - 2;
+
+                            while ((i < tokens.length && tokens[i] >= '0' && tokens[i] <= '9') || tokens[i] == ' ') {
+                                i++;
+                                cpt++;
+                            }
+                            cpt++;
+                            String doublenumber = expression.substring(i - cpt, i).replaceAll(" ", "");
+                            values.push(-1*Double.parseDouble(doublenumber));
+                        }
+
+                        // There may be more than one
+                        // digits in number
+                        else {
+                            while (i < tokens.length &&
+                                    tokens[i] >= '0' &&
+                                    tokens[i] <= '9')
+                                sbuf.append(tokens[i++]);
+                            values.push(-1*Double.parseDouble(sbuf.
+                                    toString()));
+
+                        }
+
+                        // right now the i points to
+                        // the character next to the digit,
+                        // since the for loop also increases
+                        // the i, we would skip one
+                        // token position; we need to
+                        // decrease the value of i by 1 to
+                        // correct the offset.
+                        i--;
+                    }
+
+
+                }
+
+            }
 
                 // Closing brace encountered,
                 // solve entire brace
@@ -92,7 +148,9 @@ public interface Analiseur {
             else if (tokens[i] == '+' ||
                     tokens[i] == '-' ||
                     tokens[i] == '*' ||
-                    tokens[i] == '/') {
+                    tokens[i] == '/' || tokens[i] == '^')   {
+                debut =false;
+                signe = 1;
                 // While top of 'ops' has same
                 // or greater precedence to current
                 // token, which is an operator.
@@ -126,7 +184,9 @@ public interface Analiseur {
 
                         i--;
                     }
-                    else{throw new ExpresExcept("Fonction ou Variable introuvable");}
+                    else{if( i >= expression.length())    throw new ExpresExcept("Variable introuvable");
+                       else if(tokens[i]!='(' ){   throw new ExpresExcept("Variable introuvable");                 }
+                    else throw new ExpresExcept(" Fonction  introuvable"); }
                 }
 
 
@@ -157,11 +217,14 @@ public interface Analiseur {
     // Returns true if 'op2' has higher
     // or same precedence as 'op1',
     // otherwise returns false.
-    default functionresult verefierfunc(String fonc, String express, int position,List<String> listfunc ,HashMap<String, Double> variable) {
+    default functionresult verefierfunc(String fonc, String express, int position,List<String> listfunc ,HashMap<String, Double> variable) throws ExpresExcept {
+
         char[] expression = express.toCharArray();
         Double result= 0.0;
         int compteur = 1;
-
+        while(expression[position] == ' ' && position < express.length())
+        {position++; }
+       // if(position >= express.length())  throw new ExpresExcept(" commande erroné");
         if (expression[position] == '(') {
 
 
@@ -172,7 +235,11 @@ public interface Analiseur {
                 if (expression[position] == ')') compteur--;
                 position++;
             }
-           position --;
+
+
+            if(compteur != 0)  throw new ExpresExcept(" parenthése manquante");
+
+            position --;
             String nvexp= express.substring(indice, position).replaceAll(" ","");
             try {
                 if (fonc.equals("sin")) {
@@ -192,7 +259,9 @@ public interface Analiseur {
                     result = Math.abs(evaluate(nvexp, variable));
                 }
                 else if (fonc.equals("log")) {
-                    result = Math.log(evaluate(nvexp, variable));
+                    Double val = evaluate(nvexp, variable);
+                    if(val <0)  throw new ExpresExcept(" valeur inférieure a 0 est interdit pour la fonction log");
+                    result = Math.log(val);
                 }
             }
 
@@ -243,6 +312,8 @@ public interface Analiseur {
                             UnsupportedOperationException(
                             "Cannot divide by zero");
                 return a / b;
+            case '^':
+                return Math.pow(a,b)   ;
         }
         return 0.00;
     }
